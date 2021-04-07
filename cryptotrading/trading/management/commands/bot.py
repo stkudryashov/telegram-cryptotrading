@@ -119,13 +119,13 @@ def btc_bot_edit_messages(update: Update, context: CallbackContext):
         except telepot.exception.TelegramError:
             pass
         finally:
-            bot_message = 'Привет, я бот по обмену крипты :)\nВыбери что тебя интересует'
+            bot_message = 'Привет, я бот по обмену крипты :)\nДля начала напиши точку обмена'
 
-            keyboard = InlineKeyboardMarkup(
-                inline_keyboard=[[InlineKeyboardButton(text='Купить', callback_data='buy'),
-                                  InlineKeyboardButton(text='Продать', callback_data='sell')]])
+            ProposalBtc.objects.create(
+                user_telegram_id=user_telegram_id,
+            )
 
-            bot.sendMessage(chat_id=user_telegram_id, text=bot_message, reply_markup=keyboard)
+            bot.sendMessage(chat_id=user_telegram_id, text=bot_message)
     elif 'buy' in button_press:
         try:
             bot.deleteMessage(edit_message)
@@ -135,7 +135,7 @@ def btc_bot_edit_messages(update: Update, context: CallbackContext):
             proposal_btc = ProposalBtc.objects.get(user_telegram_id=user_telegram_id)
 
             bot_text = "Текущий курс: \n\n 1 BTC -> {0} RUB\n\n".format(got_now_btc_run())
-            bot_text += "На какую сумму хотите купить BTC?"
+            bot_text += "На какую сумму ₽ хотите купить BTC?"
 
             proposal_btc.buy = True
             proposal_btc.save()
@@ -147,8 +147,8 @@ def btc_bot_edit_messages(update: Update, context: CallbackContext):
         except telepot.exception.TelegramError:
             pass
         finally:
-            bot_text = "Текущий курс: \n\n 1 BTC -> {0} RUB".format(got_now_btc_run())
-            bot_text += "На какую сумму хотите продать BTC?"
+            bot_text = "Текущий курс: \n\n 1 BTC -> {0} RUB\n\n".format(got_now_btc_run())
+            bot_text += "На какую сумму ₽ хотите продать BTC?"
 
             bot.sendMessage(chat_id=user_telegram_id, text=bot_text)
 
