@@ -11,7 +11,10 @@ class ProposalBtc(models.Model):
     is_point = models.BooleanField(default=False)  # Написал ли точку обмена
     point_name = models.CharField(max_length=16, verbose_name='exchange point', blank=True, null=True)  # Точка обмена
     date = models.DateTimeField(auto_now_add=True)  # Дата заявки
+    is_date = models.BooleanField(default=False)  # Указал ли дату визита
     date_visit = models.CharField(max_length=16, verbose_name='date of visit', blank=True, null=True)  # Дата визита
+    is_time = models.BooleanField(default=False)  # Указал ли время визита
+    time_visit = models.CharField(max_length=16, verbose_name='time of visit', blank=True, null=True)  # Время визита
 
     def __str__(self):
         return '{}-{}'.format(self.user_telegram_id, self.point_name)

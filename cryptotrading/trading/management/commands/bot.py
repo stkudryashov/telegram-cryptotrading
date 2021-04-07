@@ -47,7 +47,6 @@ def btc_bot_new_messages(update: Update, context: CallbackContext):
                     keyboard = InlineKeyboardMarkup(inline_keyboard=keyboard)
 
                     proposal_btc.count = value
-                    proposal_btc.is_count = True
                     proposal_btc.save()
 
                     bot_message = 'Теперь выбери точку обмена'
@@ -58,6 +57,32 @@ def btc_bot_new_messages(update: Update, context: CallbackContext):
             except ValueError:
                 bot_message = 'Я тебя не понял, попробуй написать сумму еще раз'
                 bot.sendMessage(user_telegram_id, bot_message)
+        elif not proposal_btc.is_date:
+            keyboard = []
+            for number in range(20):
+                if number % 5 == 0:
+                    keyboard.append([])
+                keyboard[number // 5].append(InlineKeyboardButton(
+                    text=(datetime.today() + timedelta(days=number)).strftime("%m.%d.%y"),
+                    callback_data='date {}'.format(number)))
+
+            keyboard = InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+            bot_message = 'Отлично! Теперь выбери дату визита'
+            bot.sendMessage(user_telegram_id, bot_message, reply_markup=keyboard)
+        elif not proposal_btc.is_time:
+            keyboard = []
+            for number in range(12):
+                if number % 4 == 0:
+                    keyboard.append([])
+                keyboard[number // 4].append(InlineKeyboardButton(
+                    text='{}:00'.format(number + 9),
+                    callback_data='time {}'.format(number)))
+
+            keyboard = InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+            bot_message = 'Осталось выбрать время визита'
+            bot.sendMessage(user_telegram_id, bot_message, reply_markup=keyboard)
         elif not proposal_btc.is_number:
             if len(message) < 11:
                 bot_message = 'Я не понимаю твоего номера'
@@ -73,7 +98,7 @@ def btc_bot_new_messages(update: Update, context: CallbackContext):
             bot.sendMessage(user_telegram_id, 'Заявка уже создана')
     else:
         if message == '/start' or message == 'начать':
-            bot_message = 'Привет, я бот по обмену крипты :)\nДля что ты хочешь сделать?'
+            bot_message = 'Привет, я бот по обмену крипты :)\nЧто ты хочешь сделать?'
 
             keyboard = InlineKeyboardMarkup(
                 inline_keyboard=[[InlineKeyboardButton(text='Купить', callback_data='buy'),
@@ -171,12 +196,58 @@ def btc_bot_edit_messages(update: Update, context: CallbackContext):
         finally:
             proposal_btc = ProposalBtc.objects.get(user_telegram_id=user_telegram_id)
             proposal_btc.point_name = button_press.split(' ')[1]
+            proposal_btc.is_count = True
             proposal_btc.is_point = True
             proposal_btc.save()
 
-            bot_message = 'Отлично! Теперь введи свой номер телефона'
+            keyboard = []
+            for number in range(20):
+                if number % 5 == 0:
+                    keyboard.append([])
+                keyboard[number // 5].append(InlineKeyboardButton(
+                    text=(datetime.today() + timedelta(days=number)).strftime("%m.%d.%y"),
+                    callback_data='date {}'.format(number)))
 
-            bot.sendMessage(chat_id=user_telegram_id, text=bot_message)
+            keyboard = InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+            bot_message = 'Отлично! Теперь выбери дату визита'
+            bot.sendMessage(user_telegram_id, bot_message, reply_markup=keyboard)
+    elif 'date' in button_press:
+        try:
+            bot.deleteMessage(edit_message)
+        except telepot.exception.TelegramError:
+            pass
+        finally:
+            proposal_btc = ProposalBtc.objects.get(user_telegram_id=user_telegram_id)
+            proposal_btc.date_visit = (datetime.today() + timedelta(days=int(button_press.split(' ')[1]))).strftime("%m.%d.%y")
+            proposal_btc.is_date = True
+            proposal_btc.save()
+
+            keyboard = []
+            for number in range(12):
+                if number % 4 == 0:
+                    keyboard.append([])
+                keyboard[number // 4].append(InlineKeyboardButton(
+                    text='{}:00'.format(number + 9),
+                    callback_data='time {}'.format(number + 9)))
+
+            keyboard = InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+            bot_message = 'Осталось выбрать время визита'
+            bot.sendMessage(user_telegram_id, bot_message, reply_markup=keyboard)
+    elif 'time' in button_press:
+        try:
+            bot.deleteMessage(edit_message)
+        except telepot.exception.TelegramError:
+            pass
+        finally:
+            proposal_btc = ProposalBtc.objects.get(user_telegram_id=user_telegram_id)
+            proposal_btc.time_visit = '{}:00'.format(button_press.split(' ')[1])
+            proposal_btc.is_time = True
+            proposal_btc.save()
+
+            bot_message = 'Последний шаг. Введите номер телефона'
+            bot.sendMessage(user_telegram_id, bot_message)
 
 
 class Command(BaseCommand):
