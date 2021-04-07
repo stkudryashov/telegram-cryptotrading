@@ -50,11 +50,17 @@ def btc_bot_new_messages(update: Update, context: CallbackContext):
 
         elif not proposal_btc.is_count:
             try:
-                proposal_btc.count = float(message.replace(',', '.'))
-                proposal_btc.is_count = True
-                proposal_btc.save()
+                value = float(message.replace(',', '.'))
+                exchange_point = ExchangePoint.objects.get(name=proposal_btc.point_name)
 
-                bot_message = 'Все отлично, ваша заявка создана'
+                if exchange_point.sells < value:
+                    bot_message = 'У точки нет столько денег :с'
+                else:
+                    proposal_btc.count = float(message.replace(',', '.'))
+                    proposal_btc.is_count = True
+                    proposal_btc.save()
+
+                    bot_message = 'Все отлично, ваша заявка создана'
             except ValueError:
                 bot_message = 'Я тебя не понял, попробуй написать сумму еще раз'
 
