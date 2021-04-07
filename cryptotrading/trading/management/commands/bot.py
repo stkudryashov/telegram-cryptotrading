@@ -53,7 +53,12 @@ def btc_bot_new_messages(update: Update, context: CallbackContext):
                 value = float(message.replace(',', '.'))
                 exchange_point = ExchangePoint.objects.get(name=proposal_btc.point_name)
 
-                if exchange_point.sells < value:
+                if proposal_btc.buy:
+                    exchange_point_value = exchange_point.sells
+                else:
+                    exchange_point_value = exchange_point.stocks
+
+                if exchange_point_value < value:
                     bot_message = 'У точки нет столько денег :с'
                 else:
                     proposal_btc.count = float(message.replace(',', '.'))
