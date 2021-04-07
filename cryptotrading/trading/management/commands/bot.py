@@ -133,8 +133,9 @@ def btc_bot_edit_messages(update: Update, context: CallbackContext):
             pass
         finally:
             proposal_btc = ProposalBtc.objects.get(user_telegram_id=user_telegram_id)
+            percent = got_now_btc_run() * ExchangePoint.objects.get(name=proposal_btc.point_name).percent_sell
 
-            bot_text = "Текущий курс: \n\n 1 BTC -> {0} RUB\n\n".format(got_now_btc_run())
+            bot_text = "Текущий курс: \n\n 1 BTC -> {0} RUB\n\n".format(round(got_now_btc_run() - percent, 2))
             bot_text += "На какую сумму ₽ хотите купить BTC?"
 
             proposal_btc.buy = True
@@ -147,7 +148,10 @@ def btc_bot_edit_messages(update: Update, context: CallbackContext):
         except telepot.exception.TelegramError:
             pass
         finally:
-            bot_text = "Текущий курс: \n\n 1 BTC -> {0} RUB\n\n".format(got_now_btc_run())
+            proposal_btc = ProposalBtc.objects.get(user_telegram_id=user_telegram_id)
+            percent = got_now_btc_run() * ExchangePoint.objects.get(name=proposal_btc.point_name).percent_buy
+
+            bot_text = "Текущий курс: \n\n 1 BTC -> {0} RUB\n\n".format(round(got_now_btc_run() + percent, 2))
             bot_text += "На какую сумму ₽ хотите продать BTC?"
 
             bot.sendMessage(chat_id=user_telegram_id, text=bot_text)

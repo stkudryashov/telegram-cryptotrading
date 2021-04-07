@@ -22,6 +22,8 @@ class ExchangePoint(models.Model):
     name = models.CharField(max_length=16, verbose_name='exchange point')
     stocks = models.FloatField(default=0, verbose_name='how much is in stock')
     sells = models.FloatField(default=0, verbose_name='how much can sell')
+    percent_buy = models.FloatField(default=0, verbose_name='percent buy')
+    percent_sell = models.FloatField(default=0, verbose_name='percent sell')
 
     def __str__(self):
         return self.name
