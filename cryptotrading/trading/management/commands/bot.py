@@ -63,7 +63,7 @@ def btc_bot_new_messages(update: Update, context: CallbackContext):
                 if number % 5 == 0:
                     keyboard.append([])
                 keyboard[number // 5].append(InlineKeyboardButton(
-                    text=(datetime.today() + timedelta(days=number)).strftime("%m.%d.%y"),
+                    text=(datetime.today() + timedelta(days=number)).strftime("%d.%m"),
                     callback_data='date {}'.format(number)))
 
             keyboard = InlineKeyboardMarkup(inline_keyboard=keyboard)
@@ -205,7 +205,7 @@ def btc_bot_edit_messages(update: Update, context: CallbackContext):
                 if number % 5 == 0:
                     keyboard.append([])
                 keyboard[number // 5].append(InlineKeyboardButton(
-                    text=(datetime.today() + timedelta(days=number)).strftime("%m.%d.%y"),
+                    text=(datetime.today() + timedelta(days=number)).strftime("%d.%m"),
                     callback_data='date {}'.format(number)))
 
             keyboard = InlineKeyboardMarkup(inline_keyboard=keyboard)
@@ -219,7 +219,7 @@ def btc_bot_edit_messages(update: Update, context: CallbackContext):
             pass
         finally:
             proposal_btc = ProposalBtc.objects.get(user_telegram_id=user_telegram_id)
-            proposal_btc.date_visit = (datetime.today() + timedelta(days=int(button_press.split(' ')[1]))).strftime("%m.%d.%y")
+            proposal_btc.date_visit = (datetime.today() + timedelta(days=int(button_press.split(' ')[1]))).strftime("%d.%m.%y")
             proposal_btc.is_date = True
             proposal_btc.save()
 
