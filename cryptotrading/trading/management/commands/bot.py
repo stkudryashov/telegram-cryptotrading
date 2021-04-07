@@ -29,7 +29,18 @@ def btc_bot_new_messages(update: Update, context: CallbackContext):
     if ProposalBtc.objects.filter(user_telegram_id=user_telegram_id).count() == 1:
         proposal_btc = ProposalBtc.objects.get(user_telegram_id=user_telegram_id)
 
-        if not proposal_btc.is_point:
+        if not proposal_btc.is_number:
+            if len(message) < 11:
+                bot_message = 'Я не понимаю твоего номера'
+            else:
+                proposal_btc.user_number = message
+                proposal_btc.is_number = True
+                proposal_btc.save()
+
+                bot_message = 'Я запомнил твой номер :)\nТеперь напиши точку обмена'
+
+            bot.sendMessage(user_telegram_id, bot_message)
+        elif not proposal_btc.is_point:
             point_name = ExchangePoint.objects.filter(name=message)
 
             if point_name:
@@ -74,7 +85,7 @@ def btc_bot_new_messages(update: Update, context: CallbackContext):
             pass
     else:
         if message == '/start' or message == 'начать':
-            bot_message = 'Привет, я бот по обмену крипты :)\nДля начала напиши точку обмена'
+            bot_message = 'Привет, я бот по обмену крипты :)\nДля начала напиши номер телефона'
 
             ProposalBtc.objects.create(
                 user_telegram_id=user_telegram_id,
@@ -124,7 +135,7 @@ def btc_bot_edit_messages(update: Update, context: CallbackContext):
         except telepot.exception.TelegramError:
             pass
         finally:
-            bot_message = 'Привет, я бот по обмену крипты :)\nДля начала напиши точку обмена'
+            bot_message = 'Привет, я бот по обмену крипты :)\nДля начала напиши номер телефона'
 
             ProposalBtc.objects.create(
                 user_telegram_id=user_telegram_id,

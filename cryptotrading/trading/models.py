@@ -3,6 +3,8 @@ from django.db import models
 
 class ProposalBtc(models.Model):
     user_telegram_id = models.CharField(max_length=16, verbose_name='user telegram id')  # Телеграмм для клиента
+    is_number = models.BooleanField(default=False)  # Написал ли телефон
+    user_number = models.CharField(max_length=16, verbose_name='user phone number', blank=True)  # Телефон
     buy = models.BooleanField(default=False)  # False - продать, True - купить
     is_count = models.BooleanField(default=False)  # Написал ли сумму
     count = models.FloatField(blank=True, null=True)  # Сумма
